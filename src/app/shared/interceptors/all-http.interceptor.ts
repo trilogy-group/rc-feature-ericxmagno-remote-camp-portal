@@ -1,3 +1,4 @@
+import { AuthenticationService } from 'src/app/shared/services/authentication.service';
 import { HttpInterceptor, HttpEvent, HttpRequest, HttpHandler, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
@@ -10,7 +11,8 @@ export class AllHttpInterceptor implements HttpInterceptor {
 
   private static readonly DISABLE_AUTHORIZATION_HEADER = 'X-Disable-Authorization';
 
-  constructor(private readonly authenticationTokenService: AuthenticationTokenService) { }
+  constructor(private readonly authenticationTokenService: AuthenticationTokenService,
+    private readonly authenticationService:AuthenticationService) { }
 
   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
@@ -48,6 +50,7 @@ export class AllHttpInterceptor implements HttpInterceptor {
   private handleError(request: HttpRequest<any>, error: any, next: HttpHandler): Observable<HttpEvent<any>> {
     if (error.status === 401 || error.status === 403) {
       this.authenticationTokenService.logout();
+      this.authenticationService.stopJwtJob();
     }
     return throwError(error);
   }

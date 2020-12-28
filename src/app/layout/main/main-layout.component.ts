@@ -1,3 +1,4 @@
+import { AuthenticationService } from './../../shared/services/authentication.service';
 import { Component, ViewChild } from '@angular/core';
 
 import { AuthenticationTokenService } from 'src/app/shared/services/authentication-token.service';
@@ -13,11 +14,13 @@ export class MainLayoutComponent {
   private sideBar: DfSidebar;
 
   public constructor(
-    private _authenticationTokenService: AuthenticationTokenService
+    private _authenticationTokenService: AuthenticationTokenService,
+    private _authenticationService: AuthenticationService
   ) {}
 
   public logout(): void {
     this._authenticationTokenService.logout();
+    this._authenticationService.stopJwtJob();
   }
 
   public toggleSideBar(): void {

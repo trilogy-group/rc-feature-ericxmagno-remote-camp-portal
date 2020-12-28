@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Roles } from 'src/app/constants/roles.constants';
+import jwtDecode, { JwtPayload } from 'jwt-decode';
+
 declare var signOutGoogle: any;
 
 @Injectable()
@@ -13,6 +15,19 @@ export class AuthenticationTokenService {
 
     public getToken(): string {
         return localStorage.getItem(this.TOKEN_KEY);
+    }
+
+    public getTokenExpiryStatus(): boolean {
+        /**
+         Method to get token expiry status
+         return True:
+            if time now is 12 hours past token.expiry
+         */
+        const token = this.getToken();
+        const decoded = jwtDecode<JwtPayload>(token);
+        const timeNow = Math.round(Date.now() / 1000);
+        const expiryTime = 60 * 60 * 12;
+        return decoded.exp - timeNow <= expiryTime;
     }
 
     public isLoggedIn(): boolean {
@@ -84,4 +99,6 @@ export class AuthenticationTokenService {
         newDate.setHours(hours + offset);
         return newDate;
     }
+
+
 }
